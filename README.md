@@ -91,6 +91,14 @@ mint flow at all — minting is a single payable call with the exact quoted valu
 - An NFT here is a digital collectible and an API access pass. Nothing on this
   page is a promise of financial return.
 
+## API gateway (live MVP)
+
+The collection's utility layer is built and running — see [`gateway/`](gateway/README.md).
+CatsApi holders sign a message (no transaction), the gateway verifies ownership
+on-chain, issues an API key, and meters a monthly LLM token quota per tier.
+Live endpoint: https://2382cd1b5d94aa.app.lhr.life (tunnel URL — rotates on
+reconnect; the website's gateway section carries the current one).
+
 ## Run it locally
 
 ```bash

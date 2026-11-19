@@ -86,6 +86,16 @@
     <figure><img src="assets/mythic.webp" alt="Mythic tier cat" /><figcaption><b>Mythic</b> · 10<br/>50M tokens / month</figcaption></figure>
   </div>
 
+  <h2>API Gateway</h2>
+  <p>Your cat is an API pass. The CatsApi gateway is <b>live</b>: sign a message with your wallet
+  (no transaction, no gas), get an API key, and call an OpenAI-compatible LLM endpoint.
+  Your monthly quota is the sum of your cats' tier quotas — check it any time at <code>GET /v1/me</code>.</p>
+  <table>
+    <tr><th>Gateway</th><td><a href="https://2382cd1b5d94aa.app.lhr.life">2382cd1b5d94aa.app.lhr.life</a> — free tunnel URL, rotates on reconnect; if it is down, the current URL is in the <a href="https://github.com/zeroagentic/catsapi/tree/main/gateway">gateway README</a></td></tr>
+    <tr><th>Models</th><td>gpt-6.1-sol (via upstream, translated to the OpenAI chat format)</td></tr>
+    <tr><th>Endpoint</th><td><code>POST /v1/chat/completions</code> · <code>POST /v1/keys</code> · <code>GET /v1/me</code></td></tr>
+  </table>
+
   <h2>Contract</h2>
   <table>
     <tr><th>Contract (BNB Chain)</th><td><a href="https://bscscan.com/address/0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9">0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9</a> — verified &amp; open-source on BscScan</td></tr>
