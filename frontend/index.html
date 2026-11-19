@@ -245,11 +245,11 @@
     </details>
     <details class="card">
       <summary>Privacy &amp; Terms</summary>
-      <p class="mut">This section is maintained by the project owner. Placeholders below mark what will be defined here:</p>
-      <div class="todo">Prompt logging — [owner to fill: whether prompts sent through the gateway are logged, and in what form]</div>
-      <div class="todo">Retention — [owner to fill: how long keys, usage counters and any logs are kept]</div>
-      <div class="todo">What counts as a "token" — [owner to fill: the gateway meters the upstream provider's reported token usage]</div>
-      <div class="todo">Quota reset — [owner to fill: quotas are accounted per UTC calendar month]</div>
+      <p class="mut"><b style="color:var(--text)">Prompt logging:</b> the gateway does not store or log your prompts or the model's replies — they pass through to the upstream model provider to generate the response, and are subject to that provider's own policies.</p>
+      <p class="mut"><b style="color:var(--text)">What we store:</b> your wallet address, a SHA-256 hash of your API key (the key itself is shown once and never stored in plain text), the token IDs and tiers you hold, and usage counters (tokens used, request count, last-used time). We never ask for or store seed phrases, private keys, or wallet sessions.</p>
+      <p class="mut"><b style="color:var(--text)">Retention:</b> usage counters are kept for the current accounting month. An API key stays valid until you request a new one (which revokes the old) or the owner revokes it. You can see everything recorded for your key at any time via <code>GET /v1/me</code>.</p>
+      <p class="mut"><b style="color:var(--text)">What counts as a "token":</b> usage is metered in tokens as reported by the upstream provider for each request (prompt + completion). That count can include system context added by the upstream, so the metered total may be higher than the visible length of your conversation.</p>
+      <p class="mut"><b style="color:var(--text)">Quota reset:</b> your quota is the sum of your cats' tier quotas and resets at the start of each UTC calendar month. Unused quota does not roll over.</p>
     </details>
   </section>
 
