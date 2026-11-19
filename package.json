@@ -1,1 +1,19 @@
-{"dependencies":{"@openzeppelin/contracts":"^5.0.2","dotenv":"^16.4.5"},"description":"ERC-721 mint project on BSC, gated by SPACE ID Agent ID","devDependencies":{"@nomicfoundation/hardhat-toolbox":"^5.0.0","hardhat":"^2.22.0"},"name":"agentid-nft-project","private":true,"scripts":{"compile":"hardhat compile","deploy:bsc":"hardhat run scripts/deploy.js --network bsc","deploy:testnet":"hardhat run scripts/deploy.js --network bscTestnet","test":"hardhat test"},"version":"1.0.0"}
+{
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.4.5"
+  },
+  "description": "CatsApi \u2014 Agent ID gated ERC-721 on BNB Smart Chain; each NFT is an AI API access pass with tiered monthly LLM quotas.",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "name": "catsapi",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:bsc": "hardhat run scripts/deploy.js --network bsc",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network bscTestnet",
+    "test": "hardhat test"
+  },
+  "version": "1.0.0"
+}
