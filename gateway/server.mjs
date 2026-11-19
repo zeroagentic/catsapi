@@ -64,8 +64,10 @@ const RPCS = process.env.BSC_RPC_URL ? [process.env.BSC_RPC_URL] : [
 ];
 const ABI = parseAbi([
   'function totalMinted() view returns (uint256)',
+  'function freeMinted() view returns (uint256)',
   'function ownerOf(uint256 tokenId) view returns (address)',
   'function balanceOf(address owner) view returns (uint256)',
+  'function owner() view returns (address)',
 ]);
 function clientFor(rpc) {
   return createPublicClient({ chain: bsc, transport: viemHttp(rpc, { timeout: 4000 }) });
@@ -110,6 +112,62 @@ function quotaFor(tokenIds) {
   return { quota, tiers };
 }
 
+// ---------- contract owner (admin identity) ----------
+let ownerAddrCache = { at: 0, addr: null };
+async function getContractOwner() {
+  if (ownerAddrCache.addr && Date.now() - ownerAddrCache.at < 300_000) return ownerAddrCache.addr;
+  const addr = await readChain((c) => c.readContract({ address: CONTRACT, abi: ABI, functionName: 'owner' }));
+  ownerAddrCache = { at: Date.now(), addr: String(addr).toLowerCase() };
+  return ownerAddrCache.addr;
+}
+async function getMintStats() {
+  return readChain(async (c) => {
+    const total = await c.readContract({ address: CONTRACT, abi: ABI, functionName: 'totalMinted' });
+    const free = await c.readContract({ address: CONTRACT, abi: ABI, functionName: 'freeMinted' });
+    return { totalMinted: Number(total), freeMinted: Number(free) };
+  });
+}
+
+// ---------- admin auth ----------
+// Owner logs in by signing with the contract-owner wallet (checked on-chain).
+// The operator's agent uses a localhost-only token from the environment.
+const AGENT_ADMIN_TOKEN = process.env.AGENT_ADMIN_TOKEN || null;
+const adminSessions = new Map(); // token -> expiresAt
+function isAdmin(req) {
+  const h = req.headers['authorization'] || '';
+  const m = h.match(/^Bearer\s+(.+)$/i);
+  if (m) {
+    const exp = adminSessions.get(m[1].trim());
+    if (exp && exp > Date.now()) return true;
+  }
+  const ra = req.socket && req.socket.remoteAddress || '';
+  if (AGENT_ADMIN_TOKEN && (ra === '127.0.0.1' || ra === '::ffff:127.0.0.1' || ra === '::1')
+      && req.headers['x-agent-token'] === AGENT_ADMIN_TOKEN) return true;
+  return false;
+}
+
+// ---------- upstream probe (cached 60s) ----------
+let probeCache = { at: 0, data: null };
+async function probeUpstream() {
+  if (probeCache.data && Date.now() - probeCache.at < 60_000) return probeCache.data;
+  let data;
+  try {
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000);
+    const r = await fetch(UPSTREAM.base + '/models', { headers: { 'authorization': `Bearer ${UPSTREAM.key}`, 'user-agent': UPSTREAM.ua }, signal: ctl.signal });
+    clearTimeout(t);
+    let models = UPSTREAM.models;
+    try { const j = await r.json(); if (Array.isArray(j.data)) models = j.data.map((x) => x.id); } catch { /* keep configured */ }
+    data = { name: 'Xingchi', base: UPSTREAM.base, style: UPSTREAM.style, ok: r.ok, status: r.status, models, default_model: UPSTREAM.defaultModel, probed_at: new Date().toISOString() };
+  } catch (e) {
+    data = { name: 'Xingchi', base: UPSTREAM.base, style: UPSTREAM.style, ok: false, status: 0, models: UPSTREAM.models, default_model: UPSTREAM.defaultModel, error: String(e && e.message || e).slice(0, 120), probed_at: new Date().toISOString() };
+  }
+  probeCache = { at: Date.now(), data };
+  return data;
+}
+function currentTunnelUrl() {
+  try { return readFileSync(new URL('./hosting/current-url.txt', import.meta.url).pathname, 'utf8').trim() || null; } catch { return null; }
+}
+
 // ---------- db ----------
 mkdirSync(DATA_DIR, { recursive: true });
 let db = { keys: {}, usage: {}, global: {} };
@@ -128,6 +186,8 @@ function recordUsage(kh, tokens) {
   db.usage[kh] = db.usage[kh] || {};
   db.usage[kh][m] = (db.usage[kh][m] || 0) + tokens;
   db.global[m] = (db.global[m] || 0) + tokens;
+  const rec = db.keys[kh];
+  if (rec) { rec.requests = (rec.requests || 0) + 1; rec.lastUsedAt = new Date().toISOString(); }
   saveDb();
 }
 
@@ -188,8 +248,138 @@ Timestamp: &lt;unix time in milliseconds&gt;</pre>
 Mint a cat at <a href="https://zeroagentic.github.io/catsapi/">zeroagentic.github.io/catsapi</a> — Agent ID holders mint their first one free.</p>
 </body></html>`;
 
+const ADMIN_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CatsApi Gateway — Owner Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+<style>
+body{font-family:system-ui,sans-serif;background:#0b0e14;color:#e8ecf3;max-width:1060px;margin:0 auto;padding:28px 18px;line-height:1.55}
+h1{font-size:24px} h2{font-size:16px;color:#f0b90b;margin:0 0 8px}
+a{color:#f0b90b} code{background:#121826;padding:2px 6px;border-radius:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:16px 0}
+.card{background:#121826;border:1px solid #1e293b;border-radius:12px;padding:16px}
+.big{font-size:22px;font-weight:700}
+.mut{color:#8b98ad;font-size:13px}
+.bar{height:8px;background:#1e293b;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:#f0b90b}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid #1e293b;padding:7px 6px;text-align:left;vertical-align:top}
+button{background:#f0b90b;color:#111;border:0;padding:9px 14px;border-radius:9px;font-weight:700;cursor:pointer}
+button.ghost{background:#1e293b;color:#e8ecf3}
+button:disabled{opacity:.45;cursor:default}
+.ok{color:#4ade80}.bad{color:#f87171}
+input{background:#0b0e14;border:1px solid #1e293b;color:#e8ecf3;border-radius:8px;padding:8px}
+</style></head>
+<body>
+<h1>CatsApi Gateway — Owner Dashboard</h1>
+<div id="loginView">
+  <p>Owner-only. Sign in by signing a message with the <b>contract owner wallet</b> (checked on-chain against the CatsApi contract). No transaction, no gas. The session lasts 24 hours in this browser.</p>
+  <button id="loginBtn">Sign in with owner wallet</button>
+  <p id="loginMsg" class="mut"></p>
+</div>
+<div id="dashView" style="display:none">
+  <p><button class="ghost" id="refreshBtn">Refresh</button> <button class="ghost" id="logoutBtn">Log out</button> <span id="dashMsg" class="mut"></span></p>
+  <div class="grid">
+    <div class="card"><h2>Contract</h2><div id="cContract"></div></div>
+    <div class="card"><h2>Usage this month</h2><div id="cUsage"></div></div>
+    <div class="card"><h2>Provider</h2><div id="cProvider"></div></div>
+    <div class="card"><h2>Public tunnel</h2><div id="cTunnel"></div></div>
+  </div>
+  <div class="card"><h2>API keys</h2><div id="cKeys"></div></div>
+</div>
+<script>
+var S = localStorage.getItem("catsAdminSession") || null;
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function short(a){return a? a.slice(0,6)+"…"+a.slice(-4) : "—";}
+async function api(path, opts){
+  opts = opts || {}; opts.headers = opts.headers || {};
+  opts.headers["authorization"] = "Bearer " + S;
+  var r = await fetch(path, opts); var j = await r.json();
+  if(!r.ok) throw new Error((j.error && j.error.message) || ("HTTP "+r.status));
+  return j;
+}
+document.getElementById("loginBtn").onclick = async function(){
+  var msg = document.getElementById("loginMsg");
+  try{
+    if(!window.ethereum) throw new Error("No wallet found — open this page in your wallet browser.");
+    var p = new ethers.BrowserProvider(window.ethereum);
+    var s = await p.getSigner(); var address = await s.getAddress();
+    msg.textContent = "Sign the admin login in your wallet…";
+    var message = "CatsApi Gateway admin login\nAddress: " + address + "\nTimestamp: " + Date.now();
+    var signature = await s.signMessage(message);
+    var r = await fetch("/admin/login", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({address:address, message:message, signature:signature})});
+    var j = await r.json();
+    if(!r.ok) throw new Error((j.error && j.error.message) || "login failed");
+    S = j.session; localStorage.setItem("catsAdminSession", S);
+    msg.textContent = "";
+    showDash(); load();
+  }catch(e){ msg.textContent = "Error: " + (e.shortMessage || e.message); }
+};
+function showDash(){
+  document.getElementById("loginView").style.display = "none";
+  document.getElementById("dashView").style.display = "block";
+}
+document.getElementById("logoutBtn").onclick = function(){ localStorage.removeItem("catsAdminSession"); location.reload(); };
+document.getElementById("refreshBtn").onclick = function(){ load(); };
+async function load(){
+  var dm = document.getElementById("dashMsg");
+  try{
+    var o = await api("/admin/overview");
+    var k = await api("/admin/keys");
+    document.getElementById("cContract").innerHTML =
+      "Contract <code>" + short(o.contract) + "</code><br>Owner <code>" + short(o.owner) + "</code><br>" +
+      "<span class='big'>" + (o.mint ? o.mint.totalMinted : "?") + "</span> minted · " + (o.mint ? o.mint.freeMinted : "?") + " free";
+    var pct = o.global_monthly_cap ? Math.min(100, Math.round(100 * o.global_used_this_month / o.global_monthly_cap)) : 0;
+    document.getElementById("cUsage").innerHTML =
+      "<span class='big'>" + o.global_used_this_month.toLocaleString() + "</span> / " + o.global_monthly_cap.toLocaleString() + " tokens<br>" +
+      "<span class='mut'>Period " + esc(o.period) + " · keys: " + o.keys_active + " active, " + o.keys_revoked + " revoked</span>" +
+      "<div class='bar'><i style='width:" + pct + "%'></i></div>";
+    var pr = o.provider || {};
+    document.getElementById("cProvider").innerHTML =
+      "<b>" + esc(pr.name || "—") + "</b> " + (pr.ok ? "<span class='ok'>● up</span>" : "<span class='bad'>● down</span>") + "<br>" +
+      "<span class='mut'>" + esc(pr.base || "") + " · style " + esc(pr.style || "") + "<br>Models: " + esc((pr.models || []).join(", ")) + "<br>Probed " + esc(pr.probed_at || "") + (pr.error ? "<br>" + esc(pr.error) : "") + "</span>";
+    document.getElementById("cTunnel").innerHTML = o.tunnel_url
+      ? "<a href='" + esc(o.tunnel_url) + "/health' target='_blank'>" + esc(o.tunnel_url) + "</a><br><span class='mut'>Free tunnel — the URL rotates on reconnect; this is the current one.</span>"
+      : "<span class='mut'>No tunnel URL recorded.</span>";
+    var rows = k.keys.map(function(x){
+      var toks = (x.tokens || []).map(function(t){ return "#" + t.tokenId + " " + t.tier; }).join(", ") || "—";
+      var rem = x.quota_per_month != null ? Math.max(0, x.quota_per_month - x.used_this_month).toLocaleString() : "—";
+      return "<tr><td><code>" + short(x.address) + "</code><br><span class='mut'>" + esc(x.id) + "</span></td>" +
+        "<td>" + esc(toks) + "</td>" +
+        "<td>" + (x.quota_per_month != null ? x.quota_per_month.toLocaleString() : "—") + "</td>" +
+        "<td>" + x.used_this_month.toLocaleString() + "</td><td>" + rem + "</td>" +
+        "<td>" + x.requests + "</td><td>" + esc(x.last_used_at || "—") + "</td>" +
+        "<td>" + (x.revoked ? "<span class='bad'>revoked</span>" : "<span class='ok'>active</span>") + "</td>" +
+        "<td>" + (x.revoked ? "" : "<button class='ghost' data-revoke='" + esc(x.id) + "'>Revoke</button>") + "</td></tr>";
+    }).join("");
+    document.getElementById("cKeys").innerHTML = k.keys.length
+      ? "<table><tr><th>Wallet / key</th><th>Tokens</th><th>Quota/mo</th><th>Used</th><th>Left</th><th>Req</th><th>Last used</th><th>Status</th><th></th></tr>" + rows + "</table>"
+      : "<span class='mut'>No keys issued yet.</span>";
+    var btns = document.querySelectorAll("[data-revoke]");
+    for(var i=0;i<btns.length;i++){ btns[i].onclick = async function(){
+      var hp = this.getAttribute("data-revoke");
+      if(!confirm("Revoke key " + hp + "? The holder loses API access immediately.")) return;
+      await api("/admin/revoke", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({hash_prefix: hp})});
+      load();
+    }; }
+    dm.textContent = "Updated " + new Date().toLocaleTimeString();
+  }catch(e){
+    dm.textContent = "Error: " + e.message;
+    if(/invalid|session/i.test(e.message)){ localStorage.removeItem("catsAdminSession"); }
+  }
+}
+if(S){ showDash(); load(); setInterval(function(){ if(S) load(); }, 30000); }
+</script>
+</body></html>`;
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  // CORS: the public website (GitHub Pages) calls this API from the browser.
+  // All sensitive routes are bearer/signature authenticated, so * is safe here.
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'authorization, content-type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   try {
     if (req.method === 'GET' && url.pathname === '/') return send(res, 200, LANDING);
     if (req.method === 'GET' && url.pathname === '/health') {
@@ -214,7 +404,7 @@ const server = http.createServer(async (req, res) => {
       // rotate: revoke previous keys of this address
       for (const [kh, rec] of Object.entries(db.keys)) if (rec.address === addr) rec.revoked = true;
       const apiKey = 'sk-cats-' + randomBytes(24).toString('hex');
-      db.keys[hashKey(apiKey)] = { address: addr, createdAt: new Date().toISOString(), revoked: false };
+      db.keys[hashKey(apiKey)] = { address: addr, createdAt: new Date().toISOString(), revoked: false, tokens: tiers, quotaPerMonth: quota, requests: 0, lastUsedAt: null };
       saveDb();
       return send(res, 200, { api_key: apiKey, address: addr, tokens: tiers, quota_per_month: quota, period: monthKey(), note: 'Store this key now — it is shown once and only its hash is kept. Requesting a new key revokes this one.' });
     }
@@ -310,6 +500,64 @@ const server = http.createServer(async (req, res) => {
       }
       recordUsage(k.kh, tokens);
       return send(res, 200, json);
+    }
+
+    // ---------- admin (owner dashboard) ----------
+    if (req.method === 'GET' && url.pathname === '/admin') return send(res, 200, ADMIN_HTML);
+
+    if (req.method === 'POST' && url.pathname === '/admin/login') {
+      const { address, message, signature } = await readBody(req);
+      if (!address || !message || !signature) return err(res, 400, 'address, message and signature are required');
+      const addr = String(address).toLowerCase();
+      const m = String(message).match(/Timestamp:\s*(\d{10,13})/);
+      if (!m) return err(res, 400, 'message must contain "Timestamp: <unix ms>"');
+      if (Math.abs(Date.now() - Number(m[1])) > SIG_WINDOW_MS) return err(res, 400, 'signature timestamp expired (10 minute window)');
+      if (!String(message).includes('CatsApi Gateway admin login')) return err(res, 400, 'message must be the CatsApi Gateway admin login text');
+      let recovered;
+      try { recovered = (await recoverMessageAddress({ message: String(message), signature })).toLowerCase(); }
+      catch { return err(res, 400, 'invalid signature'); }
+      if (recovered !== addr) return err(res, 403, 'signature does not match address');
+      const owner = await getContractOwner();
+      if (addr !== owner) return err(res, 403, 'this wallet is not the CatsApi contract owner');
+      const session = randomBytes(32).toString('hex');
+      adminSessions.set(session, Date.now() + 24 * 3600 * 1000);
+      return send(res, 200, { session, expires_in_hours: 24 });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/admin/overview') {
+      if (!isAdmin(req)) return err(res, 401, 'invalid or expired admin session');
+      let mint = null; try { mint = await getMintStats(); } catch { /* RPC hiccup: show nulls */ }
+      let owner = null; try { owner = await getContractOwner(); } catch { /* same */ }
+      const provider = await probeUpstream();
+      const recs = Object.values(db.keys);
+      return send(res, 200, {
+        contract: CONTRACT, owner, mint,
+        period: monthKey(), global_used_this_month: globalUsed(), global_monthly_cap: GLOBAL_MONTHLY_CAP,
+        keys_active: recs.filter((r) => !r.revoked).length, keys_revoked: recs.filter((r) => r.revoked).length,
+        provider, tunnel_url: currentTunnelUrl(),
+      });
+    }
+
+    if (req.method === 'GET' && url.pathname === '/admin/keys') {
+      if (!isAdmin(req)) return err(res, 401, 'invalid or expired admin session');
+      const keys = Object.entries(db.keys).map(([kh, r]) => ({
+        id: kh.slice(0, 10), address: r.address, created_at: r.createdAt, revoked: !!r.revoked,
+        tokens: r.tokens || [], quota_per_month: r.quotaPerMonth != null ? r.quotaPerMonth : null,
+        used_this_month: usedBy(kh), requests: r.requests || 0, last_used_at: r.lastUsedAt || null,
+      })).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+      return send(res, 200, { keys, period: monthKey() });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/admin/revoke') {
+      if (!isAdmin(req)) return err(res, 401, 'invalid or expired admin session');
+      const { hash_prefix, address } = await readBody(req);
+      let n = 0;
+      for (const [kh, rec] of Object.entries(db.keys)) {
+        if (rec.revoked) continue;
+        if ((hash_prefix && kh.startsWith(String(hash_prefix))) || (address && rec.address === String(address).toLowerCase())) { rec.revoked = true; n++; }
+      }
+      if (n) saveDb();
+      return send(res, 200, { revoked: n });
     }
 
     return err(res, 404, 'not found');

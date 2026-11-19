@@ -91,7 +91,7 @@
   (no transaction, no gas), get an API key, and call an OpenAI-compatible LLM endpoint.
   Your monthly quota is the sum of your cats' tier quotas — check it any time at <code>GET /v1/me</code>.</p>
   <table>
-    <tr><th>Gateway</th><td><a href="https://6535ebdf8f92c7.app.lhr.life">2382cd1b5d94aa.app.lhr.life</a> — free tunnel URL, rotates on reconnect; if it is down, the current URL is in the <a href="https://github.com/zeroagentic/catsapi/tree/main/gateway">gateway README</a></td></tr>
+    <tr><th>Gateway</th><td><a href="https://3df2f90349a8a0.app.lhr.life">2382cd1b5d94aa.app.lhr.life</a> — free tunnel URL, rotates on reconnect; if it is down, the current URL is in the <a href="https://github.com/zeroagentic/catsapi/tree/main/gateway">gateway README</a></td></tr>
     <tr><th>Models</th><td>gpt-6.1-sol (via upstream, translated to the OpenAI chat format)</td></tr>
     <tr><th>Endpoint</th><td><code>POST /v1/chat/completions</code> · <code>POST /v1/keys</code> · <code>GET /v1/me</code></td></tr>
   </table>
@@ -99,6 +99,7 @@
   <div class="card" style="margin-top:14px">
     <div class="row"><span><b>Get your API key</b> — sign a message with the wallet that holds your cat. No transaction, no gas. The key is shown once; requesting a new one revokes the old.</span></div>
     <button id="gwkey">Connect wallet &amp; get API key</button>
+    <p style="color:#8b98ad; font-size:13px">Contract owner? <a id="gwadmin" href="#">Open the owner dashboard</a> (sign-in with the owner wallet).</p>
     <button id="gwme" style="margin-top:10px" disabled>Check my usage</button>
     <div id="gwout" style="margin-top:12px; white-space:pre-wrap; word-break:break-all; color:#c6d0df"></div>
   </div>
@@ -192,7 +193,8 @@ $("mint").onclick = async () => {
 </script>
 
 <script>
-const GW = "https://6535ebdf8f92c7.app.lhr.life";
+const GW = "https://3df2f90349a8a0.app.lhr.life";
+document.getElementById("gwadmin").href = GW + "/admin";
 let gwApiKey = null;
 const gwOut = (t) => { document.getElementById("gwout").textContent = t; };
 document.getElementById("gwkey").onclick = async () => {

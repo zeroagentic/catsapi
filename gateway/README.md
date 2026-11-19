@@ -2,7 +2,7 @@
 
 OpenAI-compatible LLM gateway gated by CatsApi NFT ownership on BNB Smart Chain.
 
-**Live (MVP):** https://6535ebdf8f92c7.app.lhr.life — free tunnel URL, it rotates
+**Live (MVP):** https://3df2f90349a8a0.app.lhr.life — free tunnel URL, it rotates
 when the tunnel reconnects; the current one is always recorded in
 `~/workspace/catsapi-gateway/hosting/current-url.txt` on the operator host and in
 the project website's gateway section.
@@ -58,3 +58,22 @@ Local fixture (MockAgentId + the real contract on a local chain): key issuance
 the translation layer, usage metered on `/v1/me`, and a wallet without an NFT
 rejected with 403. The same negative-path test passes against the production
 instance on BNB mainnet through the public URL.
+
+## Owner dashboard
+
+`GET /admin` on the gateway domain — a single-page dashboard for the contract
+owner (and the operator's agent):
+
+- **Login:** sign a message with the contract-owner wallet; the gateway checks
+  the signer against the contract's `owner()` on-chain. Session = 24 h.
+  The agent can use a localhost-only `AGENT_ADMIN_TOKEN` header instead.
+- **Overview:** contract + owner, minted / free-minted counters, global usage
+  vs the monthly cap, key counts, the current public tunnel URL.
+- **Provider:** the single upstream (Xingchi) — base URL, API style, live
+  `/models` probe (cached 60 s), model list.
+- **Keys:** every issued key (wallet, tokens/tiers, quota, used/remaining,
+  request count, last used, status) with a one-click **Revoke**.
+
+Verified 2026-11-19: fixture test 10/10 (owner login, non-owner 403, overview
+auth, revoke kills the key) and the same checks pass on the production
+instance through its public URL.
