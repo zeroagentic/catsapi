@@ -77,3 +77,13 @@ owner (and the operator's agent):
 Verified 2026-11-19: fixture test 10/10 (owner login, non-owner 403, overview
 auth, revoke kills the key) and the same checks pass on the production
 instance through its public URL.
+
+## Client setup (no User-Agent tricks)
+
+End users never talk to the upstream directly, so the upstream's User-Agent
+requirement is absorbed by the gateway: it injects the required UA on every
+upstream call, and it performs **no UA check on inbound requests**. Any
+OpenAI-compatible client works with just two settings — Base URL (gateway +
+`/v1`) and the `sk-cats-` key. Verified end-to-end 2026-11-19 with a default
+client UA and with `python-requests/2.31.0`: both returned HTTP 200 through
+the real upstream.

@@ -244,6 +244,22 @@ Timestamp: &lt;unix time in milliseconds&gt;</pre>
 <pre>curl /v1/chat/completions -H "Authorization: Bearer sk-cats-..." \
   -H 'content-type: application/json' \
   -d '{"model":"gpt-6-astra","messages":[{"role":"user","content":"Hello"}]}'</pre>
+<h2>3. Or plug it into any OpenAI client</h2>
+<p>This gateway speaks the OpenAI API format, so any compatible app or SDK works as-is.
+The upstream provider's special User-Agent requirement is handled <b>by the gateway itself</b> —
+as a user you configure exactly two things, nothing else:</p>
+<pre>from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://&lt;this-gateway-host&gt;/v1",   # the host of this page
+    api_key="sk-cats-...",                            # your key from step 1
+)
+client.chat.completions.create(
+    model="gpt-6.1-sol",
+    messages=[{"role": "user", "content": "Hello"}],
+)</pre>
+<p>Same recipe in ChatBox, LobeChat, LibreChat and other OpenAI-compatible apps:
+Base URL = this gateway + <code>/v1</code>, API Key = your <code>sk-cats-</code> key, Model = <code>gpt-6.1-sol</code>.</p>
 <p>Check usage any time at <code>GET /v1/me</code> with your key. Keys rotate: asking for a new key revokes the old one.
 Mint a cat at <a href="https://zeroagentic.github.io/catsapi/">zeroagentic.github.io/catsapi</a> — Agent ID holders mint their first one free.</p>
 </body></html>`;
