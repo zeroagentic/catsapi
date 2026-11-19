@@ -1,0 +1,43 @@
+{
+  "name": "CatsApi #1",
+  "description": "CatsApi — an Agent ID gated cat agent on BNB Smart Chain. Holding this NFT unlocks monthly LLM API token credits; the quota is set by its Tier trait.",
+  "image": "ipfs://bafybeifiuvnoe6beo444mqeikdvlmwcbhxb76l5tuczktxosdagyaalvju/common.webp",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Common"
+    },
+    {
+      "trait_type": "Fur",
+      "value": "Orange Tabby"
+    },
+    {
+      "trait_type": "Visor",
+      "value": "Teal"
+    },
+    {
+      "trait_type": "Headset",
+      "value": "Standard"
+    },
+    {
+      "trait_type": "Badge",
+      "value": "Bronze"
+    },
+    {
+      "trait_type": "API Key",
+      "value": "Bronze Key"
+    },
+    {
+      "trait_type": "Background",
+      "value": "Mint"
+    },
+    {
+      "trait_type": "Panels",
+      "value": "Few"
+    },
+    {
+      "trait_type": "API Quota / Month",
+      "value": 500000
+    }
+  ]
+}

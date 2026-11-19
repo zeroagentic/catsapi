@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CatsApi — Agent ID Gated NFT & AI API Pass on BNB Chain</title>
+<meta name="description" content="CatsApi is an Agent ID gated ERC-721 collection on BNB Smart Chain. Agent ID holders mint their first cat free; each NFT unlocks a monthly LLM API quota by tier." />
+<meta property="og:title" content="CatsApi — Agent ID Gated NFT & AI API Pass" />
+<meta property="og:description" content="Hold an Agent ID? Your first mint is free. Each cat unlocks a monthly LLM API quota: 500K to 50M tokens by tier." />
+<meta property="og:image" content="assets/mythic.webp" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, sans-serif; background:#0b0e14; color:#e8ecf3; }
+  main { max-width:880px; margin:0 auto; padding:32px 20px 64px; }
+  h1 { font-size:40px; margin:0 0 8px; } h2 { font-size:24px; margin:40px 0 12px; }
+  .sub { color:#9aa7ba; margin:0 0 24px; font-size:17px; line-height:1.55; }
+  p, li { color:#c6d0df; line-height:1.6; }
+  a { color:#f0b90b; }
+  .hero { display:flex; gap:24px; flex-wrap:wrap; align-items:center; }
+  .hero img { width:300px; max-width:100%; border-radius:16px; border:1px solid #26314a; }
+  .card { background:#121826; border:1px solid #26314a; border-radius:16px; padding:20px; }
+  .row { display:flex; justify-content:space-between; padding:6px 0; color:#c6d0df; gap:12px; }
+  .row b { color:#fff; text-align:right; }
+  button { width:100%; padding:14px; border:0; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; background:#f0b90b; color:#111; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  input[type=number] { width:72px; padding:8px; border-radius:8px; border:1px solid #26314a; background:#0b0e14; color:#fff; font-size:16px; }
+  #status { min-height:22px; margin-top:14px; color:#f0b90b; white-space:pre-wrap; word-break:break-all; }
+  .ok { color:#3ddc84 !important; } .err { color:#ff6473 !important; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; }
+  th, td { border:1px solid #26314a; padding:8px 10px; text-align:left; color:#c6d0df; }
+  th { color:#fff; background:#121826; }
+  .tiers { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
+  .tiers figure { margin:0; background:#121826; border:1px solid #26314a; border-radius:12px; padding:10px; text-align:center; }
+  .tiers img { width:100%; border-radius:8px; }
+  .tiers figcaption { color:#c6d0df; font-size:14px; margin-top:8px; line-height:1.5; }
+  .fine { color:#9aa7ba; font-size:13px; line-height:1.6; }
+  code { color:#f0b90b; word-break:break-all; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img src="assets/mythic.webp" alt="CatsApi Mythic tier — golden cat agent operator" />
+    <div style="flex:1; min-width:260px">
+      <h1>CatsApi</h1>
+      <p class="sub">An <b>Agent ID gated</b> NFT collection on BNB Smart Chain where the NFT is also your
+      <b>AI API pass</b>. Hold an Agent ID? Your first mint is <b>free</b> (gas only).
+      Each cat unlocks a monthly LLM API quota, set by its tier — from 500K to 50M tokens.</p>
+      <p class="sub">Built for the Binance Wallet Agent ID Hackathon. Independent project — not affiliated with Binance.</p>
+    </div>
+  </div>
+
+  <h2 id="mint">Mint</h2>
+  <div class="card">
+    <div class="row"><span>Wallet</span><b id="wallet">—</b></div>
+    <div class="row"><span>Agent ID</span><b id="agentid">—</b></div>
+    <div class="row"><span>Minted</span><b id="supply">—</b></div>
+    <div class="row"><span>Mint open</span><b id="open">—</b></div>
+    <div class="row"><span>Your mints</span><b id="mine">—</b></div>
+    <div class="row"><span>Quantity (max 5 / wallet)</span><input id="qty" type="number" min="1" max="5" value="1" /></div>
+    <div class="row"><span>Total cost</span><b id="cost">—</b></div>
+    <button id="connect">Connect wallet</button>
+    <button id="mint" style="margin-top:10px" disabled>Mint</button>
+    <div id="status"></div>
+    <p class="fine">The price is always read live from the contract's <code>quote()</code> — never hardcoded.
+    You confirm every transaction yourself in your own wallet. This site never asks for a seed phrase,
+    private key, or pairing code, and there is no QR-code login.</p>
+  </div>
+
+  <h2>How Agent ID works here</h2>
+  <p>Agent ID is the on-chain identity of an Agentic Wallet (<code>name.ai</code>, issued via SPACE ID,
+  registry <code>0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</code>). CatsApi uses it as core access control:</p>
+  <ol>
+    <li><b>Mint gate (on-chain):</b> minting calls the registry — without an Agent ID the transaction reverts.</li>
+    <li><b>Free entitlement (on-chain):</b> each Agent ID holder gets exactly 1 free mint (global free pool 1,500 of 2,500).</li>
+    <li><b>Utility gate (gateway):</b> holding a cat unlocks its monthly API quota; the gateway checks your CatsApi balance on BSC before issuing an API key.</li>
+  </ol>
+  <p>No Agent ID yet? Claim one in the Binance App: <b>Wallet → homepage banner → Agent ID</b> (one per user, non-transferable).</p>
+
+  <h2>Tiers</h2>
+  <div class="tiers">
+    <figure><img src="assets/common.webp" alt="Common tier cat" /><figcaption><b>Common</b> · 1,425<br/>500K tokens / month</figcaption></figure>
+    <figure><img src="assets/rare.webp" alt="Rare tier cat" /><figcaption><b>Rare</b> · 675<br/>1M tokens / month</figcaption></figure>
+    <figure><img src="assets/epic.webp" alt="Epic tier cat" /><figcaption><b>Epic</b> · 300<br/>5M tokens / month</figcaption></figure>
+    <figure><img src="assets/legendary.webp" alt="Legendary tier cat" /><figcaption><b>Legendary</b> · 90<br/>20M tokens / month</figcaption></figure>
+    <figure><img src="assets/mythic.webp" alt="Mythic tier cat" /><figcaption><b>Mythic</b> · 10<br/>50M tokens / month</figcaption></figure>
+  </div>
+
+  <h2>Contract</h2>
+  <table>
+    <tr><th>Contract (BNB Chain)</th><td><a href="https://bscscan.com/address/0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9">0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9</a> — verified &amp; open-source on BscScan</td></tr>
+    <tr><th>Supply / price</th><td>2,500 max · first 1,500 mints can use the free slot (1 free per Agent ID wallet) · then 0.001 BNB · max 5 per wallet · 5% royalty</td></tr>
+    <tr><th>Source code</th><td><a href="https://github.com/zeroagentic/catsapi">github.com/zeroagentic/catsapi</a></td></tr>
+  </table>
+  <p><b>Owner permissions, disclosed:</b> the owner can open/close minting, toggle the Agent ID requirement,
+  update the registry and metadata URIs, reveal metadata (one-way), set the royalty, and withdraw proceeds.
+  The owner cannot mint beyond the 2,500 cap, change the price or free-pool constants, freeze or move user tokens, or charge a tax.
+  Full details in the repo README.</p>
+
+  <p class="fine">A CatsApi NFT is a digital collectible and an API access pass. Nothing here is a promise of
+  financial return. CatsApi is an independent project and is not affiliated with or endorsed by Binance or BNB Chain;
+  those names describe the network and identity system this contract integrates with.</p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script>
+const CONFIG = {
+  contractAddress: "0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9",
+  chainId: 56, // BSC mainnet. Use 97 for BSC testnet.
+  chainName: "BNB Smart Chain",
+  rpc: "https://bsc-dataseed.bnbchain.org",
+};
+const ABI = [
+  "function mintOpen() view returns (bool)",
+  "function totalMinted() view returns (uint256)",
+  "function MAX_SUPPLY() view returns (uint256)",
+  "function mintedBy(address) view returns (uint256)",
+  "function hasAgentId(address) view returns (bool)",
+  "function quote(address,uint256) view returns (uint256,uint256)",
+  "function mint(uint256) payable",
+];
+const $ = (id) => document.getElementById(id);
+const status = (msg, cls = "") => { const s = $("status"); s.textContent = msg; s.className = cls; };
+let provider, signer, contract, account;
+
+async function refresh() {
+  if (!contract) return;
+  const [open, minted, max, mine, has] = await Promise.all([
+    contract.mintOpen(), contract.totalMinted(), contract.MAX_SUPPLY(),
+    account ? contract.mintedBy(account) : 0n, account ? contract.hasAgentId(account) : false,
+  ]);
+  $("open").textContent = open ? "OPEN" : "CLOSED";
+  $("supply").textContent = `${minted} / ${max}`;
+  $("mine").textContent = account ? `${mine} / 5` : "—";
+  $("agentid").textContent = account ? (has ? "YES ✓" : "NO — mint blocked") : "—";
+  const qty = BigInt($("qty").value || 1);
+  if (account) {
+    const [cost, freeQty] = await contract.quote(account, qty);
+    $("cost").textContent = cost === 0n ? "FREE (gas only)" : `${ethers.formatEther(cost)} BNB` + (freeQty > 0n ? ` — incl. ${freeQty} free` : "");
+    $("mint").disabled = !open;
+  }
+}
+$("qty").addEventListener("change", refresh);
+
+$("connect").onclick = async () => {
+  try {
+    if (!window.ethereum) throw new Error("No wallet found — install MetaMask / Binance Wallet.");
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const net = await provider.getNetwork();
+    if (Number(net.chainId) !== CONFIG.chainId) {
+      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x" + CONFIG.chainId.toString(16) }] });
+      provider = new ethers.BrowserProvider(window.ethereum);
+    }
+    signer = await provider.getSigner();
+    account = await signer.getAddress();
+    contract = new ethers.Contract(CONFIG.contractAddress, ABI, signer);
+    $("wallet").textContent = account.slice(0, 6) + "…" + account.slice(-4);
+    await refresh();
+    status("Connected.", "ok");
+  } catch (e) { status(e.shortMessage || e.message, "err"); }
+};
+
+$("mint").onclick = async () => {
+  try {
+    const qty = BigInt($("qty").value || 1);
+    const [cost] = await contract.quote(account, qty); // never guess the price — read it on-chain
+    status("Confirm in your wallet…");
+    const tx = await contract.mint(qty, { value: cost });
+    status(`Sent: ${tx.hash}\nWaiting for confirmation…`);
+    await tx.wait();
+    status(`Minted ✓  https://bscscan.com/tx/${tx.hash}`, "ok");
+    await refresh();
+  } catch (e) { status(e.shortMessage || e.message, "err"); }
+};
+</script>
+</body>
+</html>
