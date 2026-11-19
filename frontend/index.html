@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,119 +7,257 @@
 <meta name="description" content="CatsApi is an Agent ID gated ERC-721 collection on BNB Smart Chain. Agent ID holders mint their first cat free; each NFT unlocks a monthly LLM API quota by tier." />
 <meta property="og:title" content="CatsApi — Agent ID Gated NFT & AI API Pass" />
 <meta property="og:description" content="Hold an Agent ID? Your first mint is free. Each cat unlocks a monthly LLM API quota: 500K to 50M tokens by tier." />
-<meta property="og:image" content="assets/mythic.webp" />
+<meta property="og:image" content="https://gateway.prjktspace.web.id/assets/mythic.webp" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M10 26 L14 6 L28 16 H36 L50 6 L54 26 C58 40 48 56 32 56 C16 56 6 40 10 26Z' fill='%23F5C542'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
 <style>
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: system-ui, sans-serif; background:#0b0e14; color:#e8ecf3; }
-  main { max-width:880px; margin:0 auto; padding:32px 20px 64px; }
-  h1 { font-size:40px; margin:0 0 8px; } h2 { font-size:24px; margin:40px 0 12px; }
-  .sub { color:#9aa7ba; margin:0 0 24px; font-size:17px; line-height:1.55; }
-  p, li { color:#c6d0df; line-height:1.6; }
-  a { color:#f0b90b; }
-  .hero { display:flex; gap:24px; flex-wrap:wrap; align-items:center; }
-  .hero img { width:300px; max-width:100%; border-radius:16px; border:1px solid #26314a; }
-  .card { background:#121826; border:1px solid #26314a; border-radius:16px; padding:20px; }
-  .row { display:flex; justify-content:space-between; padding:6px 0; color:#c6d0df; gap:12px; }
-  .row b { color:#fff; text-align:right; }
-  button { width:100%; padding:14px; border:0; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; background:#f0b90b; color:#111; }
-  button:disabled { opacity:.45; cursor:not-allowed; }
-  input[type=number] { width:72px; padding:8px; border-radius:8px; border:1px solid #26314a; background:#0b0e14; color:#fff; font-size:16px; }
-  #status { min-height:22px; margin-top:14px; color:#f0b90b; white-space:pre-wrap; word-break:break-all; }
-  .ok { color:#3ddc84 !important; } .err { color:#ff6473 !important; }
-  table { width:100%; border-collapse:collapse; margin:12px 0; }
-  th, td { border:1px solid #26314a; padding:8px 10px; text-align:left; color:#c6d0df; }
-  th { color:#fff; background:#121826; }
-  .tiers { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; }
-  .tiers figure { margin:0; background:#121826; border:1px solid #26314a; border-radius:12px; padding:10px; text-align:center; }
-  .tiers img { width:100%; border-radius:8px; }
-  .tiers figcaption { color:#c6d0df; font-size:14px; margin-top:8px; line-height:1.5; }
-  .fine { color:#9aa7ba; font-size:13px; line-height:1.6; }
-  code { color:#f0b90b; word-break:break-all; }
+  :root{
+    --bg:#0E1116; --text:#EDEFF3; --mut:#A3ABB8; --card:#171B22; --border:#262C36;
+    --accent:#F5C542; --accent-text:#0E1116; --btn-border:#3A4250; --code-bg:#10141B;
+    --ok:#3ddc84; --err:#ff6473; --sk:#262C36;
+  }
+  [data-theme="light"]{
+    --bg:#F6F7F9; --text:#161A21; --mut:#4B5563; --card:#FFFFFF; --border:#D9DEE6;
+    --accent:#F5C542; --accent-text:#0E1116; --btn-border:#B9C1CE; --code-bg:#EEF1F5;
+    --ok:#0B7A43; --err:#C81E3A; --sk:#E2E6EC;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Inter,system-ui,sans-serif; font-size:16px; line-height:1.55; }
+  a { color:var(--text); } a:hover { color:var(--accent); }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 24px; }
+  .mut { color:var(--mut); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 24px; border-radius:10px; font:600 15px Inter,sans-serif; text-decoration:none; border:1px solid var(--btn-border); background:transparent; color:var(--text); cursor:pointer; }
+  .btn:hover { border-color:var(--accent); }
+  .btn-accent { background:var(--accent); color:var(--accent-text); border-color:var(--accent); }
+  .btn-accent:hover { color:var(--accent-text); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .h2 { font:700 32px 'Space Grotesk',sans-serif; margin:0 0 8px; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em; word-break:break-all; }
+  .sk { display:inline-block; width:72px; height:20px; border-radius:6px; background:var(--sk); vertical-align:middle; animation:pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+
+  header.site { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--border); }
+  .nav { display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; justify-content:space-between; padding-top:12px; padding-bottom:12px; }
+  .logo { font:700 22px 'Space Grotesk',sans-serif; text-decoration:none; }
+  nav.links { display:flex; flex-wrap:wrap; gap:8px 20px; font-size:15px; }
+  nav.links a { text-decoration:none; }
+  .nav-actions { display:flex; gap:10px; align-items:center; }
+  .icon-btn { min-width:44px; padding:0 10px; font-size:17px; }
+
+  .hero { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:40px; align-items:center; padding:72px 0 48px; }
+  .hero h1 { font:700 clamp(34px,7vw,56px)/1.05 'Space Grotesk',sans-serif; margin:0 0 20px; }
+  .hero .lede { margin:0 0 28px; font-size:18px; max-width:480px; }
+  .hero-card { text-align:center; border-color:var(--accent); }
+  .hero-card img { width:200px; max-width:100%; border-radius:12px; }
+  .hero-big { font:700 44px 'Space Grotesk',sans-serif; color:var(--accent); margin-top:12px; }
+
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:16px; padding-bottom:64px; }
+  .stat-label { font-size:13px; color:var(--mut); }
+  .stat-value { margin-top:6px; font-weight:600; font-size:18px; }
+
+  section.block { padding-bottom:72px; }
+  .mint-card { max-width:520px; }
+  .wrows { margin-bottom:16px; }
+  .wrow { display:flex; justify-content:space-between; gap:12px; padding:5px 0; color:var(--mut); font-size:14px; }
+  .wrow b { color:var(--text); text-align:right; font-weight:600; }
+  .qty-row { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+  .stepper { display:flex; align-items:center; gap:12px; }
+  .stepper button { min-width:44px; padding:0; font-size:20px; }
+  .qty-num { font:600 20px 'Space Grotesk',sans-serif; min-width:20px; text-align:center; }
+  .cost-row { display:flex; justify-content:space-between; gap:12px; padding:14px 0; border-top:1px solid var(--border); margin-bottom:20px; }
+  #status { min-height:22px; margin-top:14px; white-space:pre-wrap; word-break:break-word; }
+  #status.ok { color:var(--ok); } #status.err { color:var(--err); }
+  .fine { font-size:13px; color:var(--mut); line-height:1.6; }
+
+  .tiers { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr)); gap:16px; }
+  .tier img { width:72px; height:72px; border-radius:10px; object-fit:cover; }
+  .tier .tname { font-weight:600; margin-top:12px; }
+  .tier .tquota { font:700 28px 'Space Grotesk',sans-serif; }
+  .tier .tsub { font-size:13px; color:var(--mut); }
+  .tier-mythic { border-color:var(--accent); }
+
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:16px; margin-top:20px; }
+  .step-num { font:700 28px 'Space Grotesk',sans-serif; color:var(--accent); }
+
+  .code-card { padding:0; overflow:hidden; margin-top:16px; }
+  .code-head { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); }
+  .code-head span { font-weight:600; }
+  .code-card pre { margin:0; padding:16px; overflow-x:auto; font-size:13px; background:var(--code-bg); color:var(--text); }
+  .api-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+  #gwout { margin-top:12px; white-space:pre-wrap; word-break:break-word; color:var(--text); }
+  #gwout:empty { margin-top:0; }
+
+  .contract-grid { margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:20px; }
+  .addr-row { display:flex; align-items:center; gap:10px; margin-top:4px; flex-wrap:wrap; }
+  details.card { margin-top:16px; }
+  details summary { cursor:pointer; font-weight:600; min-height:44px; display:flex; align-items:center; }
+  details p { margin:8px 0 0; }
+  .todo { border:1px dashed var(--btn-border); border-radius:10px; padding:10px 12px; margin-top:8px; color:var(--mut); font-size:14px; }
+
+  footer.site { border-top:1px solid var(--border); padding:32px 0; }
+  footer.site p { max-width:1120px; margin:0 auto; padding:0 24px; font-size:13px; color:var(--mut); }
 </style>
 </head>
 <body>
-<main>
-  <div class="hero">
-    <img src="assets/mythic.webp" alt="CatsApi Mythic tier — golden cat agent operator" />
-    <div style="flex:1; min-width:260px">
-      <h1>CatsApi</h1>
-      <p class="sub">An <b>Agent ID gated</b> NFT collection on BNB Smart Chain where the NFT is also your
-      <b>AI API pass</b>. Hold an Agent ID? Your first mint is <b>free</b> (gas only).
-      Each cat unlocks a monthly LLM API quota, set by its tier — from 500K to 50M tokens.</p>
-      <p class="sub">Built for the Binance Wallet Agent ID Hackathon. Independent project — not affiliated with Binance.</p>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="logo" href="#top">CatsApi</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#mint">Mint</a><a href="#tiers">Tiers</a><a href="#api">API</a><a href="#contract">Contract</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn icon-btn" id="themeBtn" aria-label="Toggle light or dark theme">☀️</button>
+      <button class="btn btn-accent" id="connectBtn">Connect wallet</button>
     </div>
   </div>
+</header>
 
-  <h2 id="mint">Mint</h2>
-  <div class="card">
-    <div class="row"><span>Wallet</span><b id="wallet">—</b></div>
-    <div class="row"><span>Agent ID</span><b id="agentid">—</b></div>
-    <div class="row"><span>Minted</span><b id="supply">—</b></div>
-    <div class="row"><span>Mint open</span><b id="open">—</b></div>
-    <div class="row"><span>Your mints</span><b id="mine">—</b></div>
-    <div class="row"><span>Quantity (max 5 / wallet)</span><input id="qty" type="number" min="1" max="5" value="1" /></div>
-    <div class="row"><span>Total cost</span><b id="cost">—</b></div>
-    <button id="connect">Connect wallet</button>
-    <button id="mint" style="margin-top:10px" disabled>Mint</button>
-    <div id="status"></div>
-    <p class="fine">The price is always read live from the contract's <code>quote()</code> — never hardcoded.
-    You confirm every transaction yourself in your own wallet. This site never asks for a seed phrase,
-    private key, or pairing code, and there is no QR-code login.</p>
-  </div>
+<main class="wrap">
 
-  <h2>How Agent ID works here</h2>
-  <p>Agent ID is the on-chain identity of an Agentic Wallet (<code>name.ai</code>, issued via SPACE ID,
-  registry <code>0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</code>). CatsApi uses it as core access control:</p>
-  <ol>
-    <li><b>Mint gate (on-chain):</b> minting calls the registry — without an Agent ID the transaction reverts.</li>
-    <li><b>Free entitlement (on-chain):</b> each Agent ID holder gets exactly 1 free mint (global free pool 1,500 of 2,500).</li>
-    <li><b>Utility gate (gateway):</b> holding a cat unlocks its monthly API quota; the gateway checks your CatsApi balance on BSC before issuing an API key.</li>
-  </ol>
-  <p>No Agent ID yet? Claim one in the Binance App: <b>Wallet → homepage banner → Agent ID</b> (one per user, non-transferable).</p>
+  <section class="hero" id="top">
+    <div>
+      <p class="mut" style="margin:0 0 12px;font-size:14px">ERC-721 on BNB Smart Chain · Agent ID gated</p>
+      <h1>Your cat is your AI API pass.</h1>
+      <p class="mut lede">Hold an Agent ID and your first mint is free. Each cat unlocks a monthly LLM API quota, from 500K to 50M tokens.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">
+        <a class="btn btn-accent" href="#mint">Mint a cat</a>
+        <a class="btn" href="#tiers">See tiers</a>
+      </div>
+    </div>
+    <div class="card hero-card">
+      <img src="assets/mythic.webp" alt="CatsApi Mythic tier — golden cat agent operator" />
+      <div class="hero-big">50M</div>
+      <div class="mut">tokens / month · Mythic · only 10 exist</div>
+    </div>
+  </section>
 
-  <h2>Tiers</h2>
-  <div class="tiers">
-    <figure><img src="assets/common.webp" alt="Common tier cat" /><figcaption><b>Common</b> · 1,425<br/>500K tokens / month</figcaption></figure>
-    <figure><img src="assets/rare.webp" alt="Rare tier cat" /><figcaption><b>Rare</b> · 675<br/>1M tokens / month</figcaption></figure>
-    <figure><img src="assets/epic.webp" alt="Epic tier cat" /><figcaption><b>Epic</b> · 300<br/>5M tokens / month</figcaption></figure>
-    <figure><img src="assets/legendary.webp" alt="Legendary tier cat" /><figcaption><b>Legendary</b> · 90<br/>20M tokens / month</figcaption></figure>
-    <figure><img src="assets/mythic.webp" alt="Mythic tier cat" /><figcaption><b>Mythic</b> · 10<br/>50M tokens / month</figcaption></figure>
-  </div>
+  <section class="stats" aria-label="Collection statistics">
+    <div class="card"><div class="stat-label">Minted</div><div class="stat-value"><span class="sk" id="stMinted"></span> <span class="mut">/ 2,500</span></div></div>
+    <div class="card"><div class="stat-label">Free pool remaining</div><div class="stat-value"><span class="sk" id="stFree"></span> <span class="mut">/ 1,500</span></div></div>
+    <div class="card"><div class="stat-label">Price after free pool</div><div class="stat-value">0.001 BNB</div></div>
+    <div class="card"><div class="stat-label">Mint status</div><div class="stat-value"><span class="sk" id="stStatus"></span></div></div>
+  </section>
 
-  <h2>API Gateway</h2>
-  <p>Your cat is an API pass. The CatsApi gateway is <b>live</b>: sign a message with your wallet
-  (no transaction, no gas), get an API key, and call an OpenAI-compatible LLM endpoint.
-  Your monthly quota is the sum of your cats' tier quotas — check it any time at <code>GET /v1/me</code>.</p>
-  <table>
-    <tr><th>Gateway</th><td><a href="https://gateway.prjktspace.web.id">gateway.prjktspace.web.id</a> — gateway home (docs + owner dashboard). API base URL: <code>https://api.prjktspace.web.id/v1</code></td></tr>
-    <tr><th>Models</th><td>gpt-6.1-sol (via upstream, translated to the OpenAI chat format)</td></tr>
-    <tr><th>Endpoint</th><td><code>POST /v1/chat/completions</code> · <code>POST /v1/keys</code> · <code>GET /v1/me</code></td></tr>
-  </table>
+  <section class="block" id="mint">
+    <h2 class="h2">Mint</h2>
+    <p class="mut" style="margin:0 0 24px">Price is read live from the contract. You confirm every transaction in your own wallet.</p>
+    <div class="card mint-card">
+      <div class="wrows">
+        <div class="wrow"><span>Wallet</span><b id="wallet">—</b></div>
+        <div class="wrow"><span>Agent ID</span><b id="agentid">—</b></div>
+        <div class="wrow"><span>Your mints</span><b id="mine">—</b></div>
+      </div>
+      <div class="qty-row">
+        <span>Quantity <span class="mut" style="font-size:13px">(max 5 per wallet)</span></span>
+        <div class="stepper">
+          <button class="btn" id="qMinus" aria-label="Decrease quantity">−</button>
+          <span class="qty-num" id="qtyNum" aria-live="polite">1</span>
+          <button class="btn" id="qPlus" aria-label="Increase quantity">+</button>
+        </div>
+      </div>
+      <div class="cost-row"><span class="mut">Total cost</span><span style="font-weight:600" id="cost">Connect wallet to read the live price</span></div>
+      <button class="btn btn-accent" id="mintBtn" style="width:100%">Connect wallet to mint</button>
+      <div id="status" role="status"></div>
+      <p class="fine" style="margin:14px 0 0">The price is always read live from the contract's <code>quote()</code> — never hardcoded.
+      This site never asks for a seed phrase, private key, or pairing code, and there is no QR-code login.</p>
+    </div>
+  </section>
 
-  <div class="card" style="margin-top:14px">
-    <div class="row"><span><b>Get your API key</b> — sign a message with the wallet that holds your cat. No transaction, no gas. The key is shown once; requesting a new one revokes the old.</span></div>
-    <button id="gwkey">Connect wallet &amp; get API key</button>
-    <p style="color:#8b98ad; font-size:13px">Contract owner? <a id="gwadmin" href="#">Open the owner dashboard</a> (sign-in with the owner wallet).</p>
-    <button id="gwme" style="margin-top:10px" disabled>Check my usage</button>
-    <div id="gwout" style="margin-top:12px; white-space:pre-wrap; word-break:break-all; color:#c6d0df"></div>
-    <p style="color:#8b98ad; font-size:13px">Then use the key in any OpenAI-compatible app (ChatBox, LobeChat, the OpenAI SDK): Base URL = https://api.prjktspace.web.id/v1, API Key = your key, Model = gpt-6.1-sol. Nothing else to configure — the gateway handles the upstream's User-Agent requirement for you.</p>
-  </div>
+  <section class="block" id="tiers">
+    <h2 class="h2">Tiers</h2>
+    <p class="mut" style="margin:0 0 24px">Your monthly quota is the sum of your cats' quotas. Tier is assigned at mint and revealed in the metadata.</p>
+    <div class="tiers">
+      <div class="card tier"><img src="assets/common.webp" alt="Common tier cat — orange tabby agent" loading="lazy" /><div class="tname" style="color:#9AA3B2">Common</div><div class="tquota">500K</div><div class="tsub">tokens / month · 1,425 supply</div></div>
+      <div class="card tier"><img src="assets/rare.webp" alt="Rare tier cat" loading="lazy" /><div class="tname" style="color:#4DA3FF">Rare</div><div class="tquota">1M</div><div class="tsub">tokens / month · 675 supply</div></div>
+      <div class="card tier"><img src="assets/epic.webp" alt="Epic tier cat" loading="lazy" /><div class="tname" style="color:#A87BFF">Epic</div><div class="tquota">5M</div><div class="tsub">tokens / month · 300 supply</div></div>
+      <div class="card tier"><img src="assets/legendary.webp" alt="Legendary tier cat" loading="lazy" /><div class="tname" style="color:#FF9A3D">Legendary</div><div class="tquota">20M</div><div class="tsub">tokens / month · 90 supply</div></div>
+      <div class="card tier tier-mythic"><img src="assets/mythic.webp" alt="Mythic tier cat — golden cat agent" loading="lazy" /><div class="tname" style="color:#F5C542">Mythic</div><div class="tquota">50M</div><div class="tsub">tokens / month · 10 supply</div></div>
+    </div>
+  </section>
 
-  <h2>Contract</h2>
-  <table>
-    <tr><th>Contract (BNB Chain)</th><td><a href="https://bscscan.com/address/0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9">0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9</a> — verified &amp; open-source on BscScan</td></tr>
-    <tr><th>Supply / price</th><td>2,500 max · first 1,500 mints can use the free slot (1 free per Agent ID wallet) · then 0.001 BNB · max 5 per wallet · 5% royalty</td></tr>
-    <tr><th>Source code</th><td><a href="https://github.com/zeroagentic/catsapi">github.com/zeroagentic/catsapi</a></td></tr>
-  </table>
-  <p><b>Owner permissions, disclosed:</b> the owner can open/close minting, toggle the Agent ID requirement,
-  update the registry and metadata URIs, reveal metadata (one-way), set the royalty, and withdraw proceeds.
-  The owner cannot mint beyond the 2,500 cap, change the price or free-pool constants, freeze or move user tokens, or charge a tax.
-  Full details in the repo README.</p>
+  <section class="block" id="how">
+    <h2 class="h2">How Agent ID works</h2>
+    <div class="steps">
+      <div class="card"><div class="step-num">1</div><div style="font-weight:600;margin:6px 0">Mint gate</div><div class="mut">Minting checks the Agent ID registry on-chain. No Agent ID, the transaction reverts.</div></div>
+      <div class="card"><div class="step-num">2</div><div style="font-weight:600;margin:6px 0">Free entitlement</div><div class="mut">One free mint per Agent ID holder from a 1,500 free pool.</div></div>
+      <div class="card"><div class="step-num">3</div><div style="font-weight:600;margin:6px 0">API quota</div><div class="mut">The gateway checks your cat balance on BSC before issuing an API key.</div></div>
+    </div>
+    <p class="fine" style="margin-top:16px">Agent ID is the on-chain identity of an Agentic Wallet (<code>name.ai</code>, issued via SPACE ID,
+    registry <code>0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F</code>). No Agent ID yet? Claim one in the Binance App:
+    <b>Wallet → homepage banner → Agent ID</b> (one per user, non-transferable).</p>
+  </section>
 
-  <p class="fine">A CatsApi NFT is a digital collectible and an API access pass. Nothing here is a promise of
-  financial return. CatsApi is an independent project and is not affiliated with or endorsed by Binance or BNB Chain;
-  those names describe the network and identity system this contract integrates with.</p>
+  <section class="block" id="api">
+    <h2 class="h2">API quickstart</h2>
+    <p class="mut" style="margin:0 0 4px">OpenAI-compatible. Base URL <code>https://api.prjktspace.web.id/v1</code> · Model <code>gpt-6.1-sol</code></p>
+    <p class="mut" style="margin:0">Sign a message with the wallet that holds your cat (no transaction, no gas) to get a key.
+    The key is shown once; requesting a new one revokes the old.</p>
+
+    <div class="card code-card">
+      <div class="code-head"><span>1 · Get an API key — POST /v1/keys</span><button class="btn copy-btn" data-copy="codeKeys">Copy</button></div>
+      <pre id="codeKeys">curl https://api.prjktspace.web.id/v1/keys \
+  -H "Content-Type: application/json" \
+  -d '{"address":"YOUR_ADDRESS","message":"CatsApi Gateway key request\nAddress: YOUR_ADDRESS\nTimestamp: 1760000000000","signature":"YOUR_SIGNATURE"}'</pre>
+    </div>
+
+    <div class="card code-card">
+      <div class="code-head"><span>2 · Chat completion — POST /v1/chat/completions</span><button class="btn copy-btn" data-copy="codeChat">Copy</button></div>
+      <pre id="codeChat">curl https://api.prjktspace.web.id/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"gpt-6.1-sol","messages":[{"role":"user","content":"Hello"}]}'</pre>
+    </div>
+
+    <div class="card code-card">
+      <div class="code-head"><span>3 · Check usage — GET /v1/me</span><button class="btn copy-btn" data-copy="codeMe">Copy</button></div>
+      <pre id="codeMe">curl https://api.prjktspace.web.id/v1/me \
+  -H "Authorization: Bearer YOUR_API_KEY"</pre>
+    </div>
+
+    <div class="api-actions">
+      <button class="btn btn-accent" id="gwkey">Sign message &amp; get API key</button>
+      <button class="btn" id="gwme" disabled>Check my usage</button>
+    </div>
+    <div id="gwout"></div>
+    <p class="fine" style="margin-top:12px">Then use the key in any OpenAI-compatible app (ChatBox, LobeChat, the OpenAI SDK):
+    Base URL = https://api.prjktspace.web.id/v1, API Key = your key, Model = gpt-6.1-sol. Nothing else to configure —
+    the gateway handles the upstream's User-Agent requirement for you. Contract owner?
+    <a href="https://gateway.prjktspace.web.id/admin">Open the owner dashboard</a> (sign-in with the owner wallet).</p>
+  </section>
+
+  <section class="block" id="contract">
+    <h2 class="h2">Contract</h2>
+    <div class="card contract-grid">
+      <div><div class="mut" style="font-size:13px">BNB Chain address</div>
+        <div class="addr-row"><code>0x3966…75C9</code><button class="btn copy-btn" data-copy-text="0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9" style="min-height:44px;padding:0 14px">Copy</button></div></div>
+      <div><div class="mut" style="font-size:13px">Supply · Royalty</div><div style="margin-top:4px">2,500 max · 5% royalty · verified &amp; open-source</div></div>
+      <div><div class="mut" style="font-size:13px">Links</div><div style="margin-top:4px;display:flex;gap:16px;flex-wrap:wrap"><a href="https://bscscan.com/address/0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9">BscScan</a><a href="https://github.com/zeroagentic/catsapi">GitHub</a><a href="https://metadata.prjktspace.web.id/1.json">Metadata</a></div></div>
+    </div>
+    <details class="card">
+      <summary>Owner permissions, disclosed</summary>
+      <p class="mut">The owner can open or close minting, toggle the Agent ID requirement, update the registry and metadata URIs, reveal metadata (one-way), set the royalty and withdraw proceeds. The owner cannot mint beyond the 2,500 cap, change price or free-pool constants, freeze or move user tokens, or charge a tax. Full details in the repo README.</p>
+    </details>
+    <details class="card">
+      <summary>Privacy &amp; Terms</summary>
+      <p class="mut">This section is maintained by the project owner. Placeholders below mark what will be defined here:</p>
+      <div class="todo">Prompt logging — [owner to fill: whether prompts sent through the gateway are logged, and in what form]</div>
+      <div class="todo">Retention — [owner to fill: how long keys, usage counters and any logs are kept]</div>
+      <div class="todo">What counts as a "token" — [owner to fill: the gateway meters the upstream provider's reported token usage]</div>
+      <div class="todo">Quota reset — [owner to fill: quotas are accounted per UTC calendar month]</div>
+    </details>
+  </section>
+
 </main>
+
+<footer class="site">
+  <p>Independent project, not affiliated with or endorsed by Binance or BNB Chain. A CatsApi NFT is a digital collectible and API access pass; nothing here promises financial return. Built for the Binance Wallet Agent ID Hackathon.</p>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <script>
@@ -141,6 +279,7 @@ const ABI = [
 const $ = (id) => document.getElementById(id);
 const status = (msg, cls = "") => { const s = $("status"); s.textContent = msg; s.className = cls; };
 let provider, signer, contract, account;
+let qtyVal = 1;
 
 async function refresh() {
   if (!contract) return;
@@ -148,20 +287,20 @@ async function refresh() {
     contract.mintOpen(), contract.totalMinted(), contract.MAX_SUPPLY(),
     account ? contract.mintedBy(account) : 0n, account ? contract.hasAgentId(account) : false,
   ]);
-  $("open").textContent = open ? "OPEN" : "CLOSED";
-  $("supply").textContent = `${minted} / ${max}`;
   $("mine").textContent = account ? `${mine} / 5` : "—";
   $("agentid").textContent = account ? (has ? "YES ✓" : "NO — mint blocked") : "—";
-  const qty = BigInt($("qty").value || 1);
+  const qty = BigInt(qtyVal);
   if (account) {
     const [cost, freeQty] = await contract.quote(account, qty);
     $("cost").textContent = cost === 0n ? "FREE (gas only)" : `${ethers.formatEther(cost)} BNB` + (freeQty > 0n ? ` — incl. ${freeQty} free` : "");
-    $("mint").disabled = !open;
+    $("mintBtn").textContent = "Mint";
+    $("mintBtn").disabled = !open;
+    if (!open) status("Minting is currently closed.", "err");
   }
+  if (window.loadStats) window.loadStats();
 }
-$("qty").addEventListener("change", refresh);
 
-$("connect").onclick = async () => {
+async function connect() {
   try {
     if (!window.ethereum) throw new Error("No wallet found — install MetaMask / Binance Wallet.");
     provider = new ethers.BrowserProvider(window.ethereum);
@@ -174,14 +313,16 @@ $("connect").onclick = async () => {
     account = await signer.getAddress();
     contract = new ethers.Contract(CONFIG.contractAddress, ABI, signer);
     $("wallet").textContent = account.slice(0, 6) + "…" + account.slice(-4);
+    $("connectBtn").textContent = account.slice(0, 6) + "…" + account.slice(-4);
     await refresh();
     status("Connected.", "ok");
   } catch (e) { status(e.shortMessage || e.message, "err"); }
-};
+}
+$("connectBtn").onclick = connect;
 
-$("mint").onclick = async () => {
+async function doMint() {
   try {
-    const qty = BigInt($("qty").value || 1);
+    const qty = BigInt(qtyVal);
     const [cost] = await contract.quote(account, qty); // never guess the price — read it on-chain
     status("Confirm in your wallet…");
     const tx = await contract.mint(qty, { value: cost });
@@ -190,12 +331,12 @@ $("mint").onclick = async () => {
     status(`Minted ✓  https://bscscan.com/tx/${tx.hash}`, "ok");
     await refresh();
   } catch (e) { status(e.shortMessage || e.message, "err"); }
-};
+}
+$("mintBtn").onclick = () => { if (account) doMint(); else connect(); };
 </script>
 
 <script>
 const GW = "https://api.prjktspace.web.id";
-document.getElementById("gwadmin").href = "https://gateway.prjktspace.web.id/admin";
 let gwApiKey = null;
 const gwOut = (t) => { document.getElementById("gwout").textContent = t; };
 document.getElementById("gwkey").onclick = async () => {
@@ -223,6 +364,67 @@ document.getElementById("gwme").onclick = async () => {
     gwOut("Used this month: " + j.used_this_month.toLocaleString() + " / " + j.quota_per_month.toLocaleString() + " tokens\nRemaining: " + j.remaining_this_month.toLocaleString());
   } catch (e) { gwOut("Error: " + (e.shortMessage || e.message)); }
 };
+</script>
+
+<script>
+// Theme toggle (dark is the default)
+(function () {
+  const root = document.documentElement;
+  const btn = document.getElementById("themeBtn");
+  const apply = (t) => { root.setAttribute("data-theme", t); btn.textContent = t === "dark" ? "☀️" : "🌙"; };
+  let saved = "dark";
+  try { saved = localStorage.getItem("catsapi-theme") || "dark"; } catch (e) {}
+  apply(saved === "light" ? "light" : "dark");
+  btn.onclick = () => {
+    const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    apply(next);
+    try { localStorage.setItem("catsapi-theme", next); } catch (e) {}
+  };
+})();
+
+// Copy buttons (code blocks + contract address)
+document.querySelectorAll(".copy-btn").forEach((b) => {
+  b.addEventListener("click", async () => {
+    const text = b.dataset.copyText || document.getElementById(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(text); }
+    catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove();
+    }
+    const old = b.textContent; b.textContent = "Copied ✓";
+    setTimeout(() => { b.textContent = old; }, 1200);
+  });
+});
+
+// Quantity stepper (1..5), re-quotes via the same refresh() as before
+$("qMinus").onclick = () => { if (qtyVal > 1) { qtyVal--; $("qtyNum").textContent = qtyVal; refresh(); } };
+$("qPlus").onclick = () => { if (qtyVal < 5) { qtyVal++; $("qtyNum").textContent = qtyVal; refresh(); } };
+
+// Public collection stats (read-only, no wallet needed)
+const STATS_ABI = [
+  "function mintOpen() view returns (bool)",
+  "function totalMinted() view returns (uint256)",
+  "function MAX_SUPPLY() view returns (uint256)",
+  "function freeMinted() view returns (uint256)",
+  "function FREE_SUPPLY() view returns (uint256)",
+];
+async function loadStats() {
+  try {
+    const ro = new ethers.Contract(CONFIG.contractAddress, STATS_ABI, new ethers.JsonRpcProvider(CONFIG.rpc));
+    const [open, minted, max, freeMinted, freeSupply] = await Promise.all([
+      ro.mintOpen(), ro.totalMinted(), ro.MAX_SUPPLY(), ro.freeMinted(), ro.FREE_SUPPLY(),
+    ]);
+    const set = (id, txt) => { const el = $(id); el.textContent = txt; el.className = ""; };
+    set("stMinted", `${minted}`);
+    set("stFree", `${freeSupply - freeMinted}`);
+    set("stStatus", open ? "OPEN" : "CLOSED");
+  } catch (e) {
+    ["stMinted", "stFree", "stStatus"].forEach((id) => { const el = $(id); el.textContent = "—"; el.className = ""; });
+  }
+}
+window.loadStats = loadStats;
+loadStats();
 </script>
 </body>
 </html>
