@@ -91,7 +91,7 @@
   (no transaction, no gas), get an API key, and call an OpenAI-compatible LLM endpoint.
   Your monthly quota is the sum of your cats' tier quotas — check it any time at <code>GET /v1/me</code>.</p>
   <table>
-    <tr><th>Gateway</th><td><a href="https://3df2f90349a8a0.app.lhr.life">2382cd1b5d94aa.app.lhr.life</a> — free tunnel URL, rotates on reconnect; if it is down, the current URL is in the <a href="https://github.com/zeroagentic/catsapi/tree/main/gateway">gateway README</a></td></tr>
+    <tr><th>Gateway</th><td><a href="https://api.prjktspace.web.id">api.prjktspace.web.id</a> — permanent Cloudflare Tunnel endpoint on the project domain</td></tr>
     <tr><th>Models</th><td>gpt-6.1-sol (via upstream, translated to the OpenAI chat format)</td></tr>
     <tr><th>Endpoint</th><td><code>POST /v1/chat/completions</code> · <code>POST /v1/keys</code> · <code>GET /v1/me</code></td></tr>
   </table>
@@ -194,7 +194,7 @@ $("mint").onclick = async () => {
 </script>
 
 <script>
-const GW = "https://3df2f90349a8a0.app.lhr.life";
+const GW = "https://api.prjktspace.web.id";
 document.getElementById("gwadmin").href = GW + "/admin";
 let gwApiKey = null;
 const gwOut = (t) => { document.getElementById("gwout").textContent = t; };
