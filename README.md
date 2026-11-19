@@ -96,7 +96,7 @@ mint flow at all — minting is a single payable call with the exact quoted valu
 The collection's utility layer is built and running — see [`gateway/`](gateway/README.md).
 CatsApi holders sign a message (no transaction), the gateway verifies ownership
 on-chain, issues an API key, and meters a monthly LLM token quota per tier.
-Live endpoint: https://2382cd1b5d94aa.app.lhr.life (tunnel URL — rotates on
+Live endpoint: https://77eef9451ea736.app.lhr.life (tunnel URL — rotates on
 reconnect; the website's gateway section carries the current one).
 
 ## Run it locally

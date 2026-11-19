@@ -2,7 +2,7 @@
 
 OpenAI-compatible LLM gateway gated by CatsApi NFT ownership on BNB Smart Chain.
 
-**Live (MVP):** https://2382cd1b5d94aa.app.lhr.life — free tunnel URL, it rotates
+**Live (MVP):** https://77eef9451ea736.app.lhr.life — free tunnel URL, it rotates
 when the tunnel reconnects; the current one is always recorded in
 `~/workspace/catsapi-gateway/hosting/current-url.txt` on the operator host and in
 the project website's gateway section.
