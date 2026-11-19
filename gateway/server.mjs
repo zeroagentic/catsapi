@@ -18,6 +18,7 @@ const CONTRACT = (process.env.CATSAPI_CONTRACT || '0x39666Ccf900f0213cEF6FaE2853
 const GLOBAL_MONTHLY_CAP = Number(process.env.GLOBAL_MONTHLY_CAP_TOKENS || 5_000_000);
 const SIG_WINDOW_MS = 10 * 60 * 1000;
 const OWNER_CACHE_MS = 120 * 1000;
+const SITE_DIR = new URL('./site/', import.meta.url).pathname;
 const DATA_DIR = new URL('./data/', import.meta.url).pathname;
 const DB_PATH = DATA_DIR + 'db.json';
 const TIERMAP_PATH = new URL('./config/tier-map.json', import.meta.url).pathname;
@@ -243,7 +244,7 @@ Timestamp: &lt;unix time in milliseconds&gt;</pre>
 <h2>2. Call the API</h2>
 <pre>curl /v1/chat/completions -H "Authorization: Bearer sk-cats-..." \
   -H 'content-type: application/json' \
-  -d '{"model":"gpt-6-astra","messages":[{"role":"user","content":"Hello"}]}'</pre>
+  -d '{"model":"gpt-6.1-sol","messages":[{"role":"user","content":"Hello"}]}'</pre>
 <h2>3. Or plug it into any OpenAI client</h2>
 <p>This gateway speaks the OpenAI API format, so any compatible app or SDK works as-is.
 The upstream provider's special User-Agent requirement is handled <b>by the gateway itself</b> —
@@ -251,7 +252,7 @@ as a user you configure exactly two things, nothing else:</p>
 <pre>from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://&lt;this-gateway-host&gt;/v1",   # the host of this page
+    base_url="https://api.prjktspace.web.id/v1",
     api_key="sk-cats-...",                            # your key from step 1
 )
 client.chat.completions.create(
@@ -259,9 +260,9 @@ client.chat.completions.create(
     messages=[{"role": "user", "content": "Hello"}],
 )</pre>
 <p>Same recipe in ChatBox, LobeChat, LibreChat and other OpenAI-compatible apps:
-Base URL = this gateway + <code>/v1</code>, API Key = your <code>sk-cats-</code> key, Model = <code>gpt-6.1-sol</code>.</p>
+Base URL = <code>https://api.prjktspace.web.id/v1</code>, API Key = your <code>sk-cats-</code> key, Model = <code>gpt-6.1-sol</code>.</p>
 <p>Check usage any time at <code>GET /v1/me</code> with your key. Keys rotate: asking for a new key revokes the old one.
-Mint a cat at <a href="https://zeroagentic.github.io/catsapi/">zeroagentic.github.io/catsapi</a> — Agent ID holders mint their first one free.</p>
+Mint a cat at <a href="https://gateway.prjktspace.web.id/">gateway.prjktspace.web.id</a> — Agent ID holders mint their first one free.</p>
 </body></html>`;
 
 const ADMIN_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
@@ -397,6 +398,21 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
   try {
+    // The project website lives on the gateway subdomain (moved off GitHub Pages):
+    // gateway.prjktspace.web.id serves site/index.html + its assets from ./site.
+    if (req.method === 'GET' && (req.headers.host || '').toLowerCase().startsWith('gateway.')) {
+      if (url.pathname === '/' || url.pathname === '/index.html') {
+        res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+        return res.end(readFileSync(SITE_DIR + 'index.html'));
+      }
+      if (url.pathname.startsWith('/assets/') && url.pathname.endsWith('.webp') && !url.pathname.includes('..')) {
+        const f = SITE_DIR + url.pathname.slice(1);
+        if (existsSync(f)) {
+          res.writeHead(200, { 'content-type': 'image/webp', 'cache-control': 'public, max-age=86400' });
+          return res.end(readFileSync(f));
+        }
+      }
+    }
     if (req.method === 'GET' && url.pathname === '/') return send(res, 200, LANDING);
     if (req.method === 'GET' && url.pathname === '/health') {
       return send(res, 200, { ok: true, contract: CONTRACT, upstream_models: UPSTREAM.models, active_keys: Object.values(db.keys).filter((k) => !k.revoked).length, global_used_this_month: globalUsed(), global_monthly_cap: GLOBAL_MONTHLY_CAP, period: monthKey() });

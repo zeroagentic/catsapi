@@ -91,7 +91,7 @@
   (no transaction, no gas), get an API key, and call an OpenAI-compatible LLM endpoint.
   Your monthly quota is the sum of your cats' tier quotas — check it any time at <code>GET /v1/me</code>.</p>
   <table>
-    <tr><th>Gateway</th><td><a href="https://api.prjktspace.web.id">api.prjktspace.web.id</a> — permanent Cloudflare Tunnel endpoint on the project domain</td></tr>
+    <tr><th>Gateway</th><td><a href="https://gateway.prjktspace.web.id">gateway.prjktspace.web.id</a> — gateway home (docs + owner dashboard). API base URL: <code>https://api.prjktspace.web.id/v1</code></td></tr>
     <tr><th>Models</th><td>gpt-6.1-sol (via upstream, translated to the OpenAI chat format)</td></tr>
     <tr><th>Endpoint</th><td><code>POST /v1/chat/completions</code> · <code>POST /v1/keys</code> · <code>GET /v1/me</code></td></tr>
   </table>
@@ -102,7 +102,7 @@
     <p style="color:#8b98ad; font-size:13px">Contract owner? <a id="gwadmin" href="#">Open the owner dashboard</a> (sign-in with the owner wallet).</p>
     <button id="gwme" style="margin-top:10px" disabled>Check my usage</button>
     <div id="gwout" style="margin-top:12px; white-space:pre-wrap; word-break:break-all; color:#c6d0df"></div>
-    <p style="color:#8b98ad; font-size:13px">Then use the key in any OpenAI-compatible app (ChatBox, LobeChat, the OpenAI SDK): Base URL = gateway + /v1, API Key = your key, Model = gpt-6.1-sol. Nothing else to configure — the gateway handles the upstream's User-Agent requirement for you.</p>
+    <p style="color:#8b98ad; font-size:13px">Then use the key in any OpenAI-compatible app (ChatBox, LobeChat, the OpenAI SDK): Base URL = https://api.prjktspace.web.id/v1, API Key = your key, Model = gpt-6.1-sol. Nothing else to configure — the gateway handles the upstream's User-Agent requirement for you.</p>
   </div>
 
   <h2>Contract</h2>
@@ -195,7 +195,7 @@ $("mint").onclick = async () => {
 
 <script>
 const GW = "https://api.prjktspace.web.id";
-document.getElementById("gwadmin").href = GW + "/admin";
+document.getElementById("gwadmin").href = "https://gateway.prjktspace.web.id/admin";
 let gwApiKey = null;
 const gwOut = (t) => { document.getElementById("gwout").textContent = t; };
 document.getElementById("gwkey").onclick = async () => {

@@ -2,7 +2,7 @@
 
 OpenAI-compatible LLM gateway gated by CatsApi NFT ownership on BNB Smart Chain.
 
-**Live:** https://api.prjktspace.web.id — permanent Cloudflare Tunnel
+**Live:** gateway home https://gateway.prjktspace.web.id (website, docs, owner dashboard) · API base URL **https://api.prjktspace.web.id/v1** — permanent Cloudflare Tunnel
 endpoint on the project's own domain (named tunnel `catsapi-gateway`,
 DNS on Cloudflare; the operator host also records it in
 `~/workspace/catsapi-gateway/hosting/current-url.txt`).
