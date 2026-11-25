@@ -11,6 +11,11 @@ API token quota that scales with the NFT's rarity tier.
 
 **Website / mint page:** GitHub Pages site in this repo (`index.html`).
 
+**Live gateway:** the API at `https://api.prjktspace.web.id` runs as a Cloudflare
+Worker — canonical source in [`worker/`](worker/) (synced to live 2026-11-25).
+The Node gateway in `gateway/` is the retired VM implementation. Key claims are
+EIP-712 only (`personal_sign` retired 2026-11-19, returns HTTP 410).
+
 Built for the **Binance Wallet Agent ID Hackathon** (2026).
 
 ## How Agent ID is used (core, not an add-on)

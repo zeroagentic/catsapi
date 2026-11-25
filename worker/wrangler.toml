@@ -1,0 +1,17 @@
+name = "catsapi-api"
+main = "src/index.js"
+compatibility_date = "2025-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+CATSAPI_CONTRACT = "0x39666Ccf900f0213cEF6FaE28537532c9B0E75C9"
+GLOBAL_MONTHLY_CAP_TOKENS = "5000000"
+UPSTREAM_BASE_URL = "https://vsllm.cc/v1"
+UPSTREAM_UA = "catsapi-gateway/0.2"
+UPSTREAM_MODELS = "gemini-4-argon"
+UPSTREAM_DEFAULT_MODEL = "gemini-4-argon"
+UPSTREAM_API_STYLE = "chat"
+
+[[kv_namespaces]]
+binding = "DB"
+id = "a4d2394c569e41b495ef67edb17d0178"

@@ -1,0 +1,1 @@
+{"name":"catsapi-worker","version":"0.1.0","private":true,"type":"module","description":"CatsApi LLM gateway as a Cloudflare Worker: NFT-gated API keys with per-tier monthly token quotas.","dependencies":{"viem":"^2.58.1"}}

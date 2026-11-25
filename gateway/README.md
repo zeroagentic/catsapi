@@ -1,12 +1,12 @@
-# CatsApi Gateway
+# CatsApi Gateway — LEGACY (retired VM implementation)
+
+> **This Node implementation is retired.** Since 2026-11-19 the live gateway is
+> the Cloudflare Worker in [`../worker/`](../worker/) — that is the canonical
+> source for `https://api.prjktspace.web.id`. This directory is kept for
+> reference; it still describes the retired `personal_sign` claim path
+> (live claims are EIP-712 only; a `personal_sign` body returns HTTP 410).
 
 OpenAI-compatible LLM gateway gated by CatsApi NFT ownership on BNB Smart Chain.
-
-**Live:** gateway home https://gateway.prjktspace.web.id (website, docs, owner dashboard) · API base URL **https://api.prjktspace.web.id/v1** — permanent Cloudflare Tunnel
-endpoint on the project's own domain (named tunnel `catsapi-gateway`,
-DNS on Cloudflare; the operator host also records it in
-`~/workspace/catsapi-gateway/hosting/current-url.txt`).
-the project website's gateway section.
 
 ## How it works
 
